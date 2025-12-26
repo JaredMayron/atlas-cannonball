@@ -45,7 +45,7 @@ FROM runway_history_2;
 {% calendar_heatmap
   data="cal_heatmap"
   date="last_until"
-  value="days_from_today"
+  value="max(days_from_today)"
   where="date {{cal_dates_range.between}}"
 /%}
 Within the period, I had on average {% value

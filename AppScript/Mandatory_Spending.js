@@ -34,8 +34,8 @@ function fetchMandatorySpending() {
   
   // Manual estimates (Restored to original non-zero values)
   const MANUAL_ESTIMATES = [
-    ["Groceries Estimate", 4,364.28],
-    ["Restaurant Estimate", 8,710.92],
+    ["Groceries Estimate", 4364.28],
+    ["Restaurant Estimate", 8710.92],
     ["Health Insurance Estimate", 6500.00]
   ];
 
