@@ -1,12 +1,10 @@
 ## Net Worth by Type
-This is a breakdown in my current net worth, assets minus liabilities. [Find a more detailed breakdown of net worth here](https://my.pocketsmith.com/net_worth)
-
-{% big_value
+This is a breakdown in my current net worth of ${% value
   data="account_categorization"
-  title="Current Net Worth"
   value="sum(balance)"
   fmt="usd"
-/%}
+/%}, which are my assets minus liabilities. [Find a more detailed breakdown of net worth here](https://my.pocketsmith.com/net_worth)
+
 {% pie_chart
   data="account_categorization"
   category="type"
@@ -16,6 +14,18 @@ This is a breakdown in my current net worth, assets minus liabilities. [Find a m
 {% table
     data="account_categorization"
     order="title asc"
-    where="type != ''"
+    row_shading=true
+    where="type != '' AND balance > 0"
 %}
+{% dimension
+  value="title"
+/%}
+{% measure
+  title="Balance"
+  value="sum(balance)"
+  fmt="usd"
+/%}
+{% pivot
+  value="type"
+/%}
 {% /table %}
