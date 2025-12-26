@@ -1,7 +1,7 @@
 ## Cash Reserves & Mandatory Expenses
 I hook into PocketSmith and try to determine how long my cash reserves will last given no income and my mandatory expenses {% info
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions."
-/%} [Click here for more information directly in PocketSmith](https://my.pocketsmith.com/dashboard/75855-emergency).
+/%}. [Click here for more information directly in PocketSmith](https://my.pocketsmith.com/dashboard/75855-emergency)
 
 I have a total of {% value
   data="account_categorization"
