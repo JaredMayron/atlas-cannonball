@@ -28,7 +28,7 @@ I have a total of {% value
 {% callout type="info" title="Cash Reserve History"%}
 An interactive graph which shows how my cash reserves change over time based on my cash on hand and my mandatory expenses {% info
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions."
-/%}. A darker square represents a more recent measurement. 
+/%}. A lighter square represents a more recent measurement. 
 {% range_calendar
   id="cal_dates_range"
   default_range="last 30 days"
@@ -141,3 +141,4 @@ A total of {% value
   color="red"
 /%} should be moved to the checking account from savings.
 {% /else%}
+
