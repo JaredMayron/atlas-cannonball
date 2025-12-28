@@ -18,7 +18,7 @@ graph TD
         PS[("PocketSmith")]
     end
 
-    subgraph "Automation &<br/>Transformation"
+    subgraph "Automation & Transformation"
         GAS["Google Apps Script"]
         GS[("Google Sheets")]
     end
@@ -27,7 +27,7 @@ graph TD
         BQ[("BigQuery")]
     end
 
-    subgraph "Visualization <br>(Evidence.Studio)"
+    subgraph "Visualization"
         E_NetWorth["Net Worth Dashboard"]
         E_CashReserves["Cash Reserves Dashboard"]
     end
