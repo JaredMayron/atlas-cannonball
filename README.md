@@ -49,3 +49,8 @@ graph TD
 4.  **Staging**: The processed data is written to dedicated tabs in a **Google Sheet**.
 5.  **Storage**: The Google Sheet is synchronized with **BigQuery**, acting as the central data warehouse.
 6.  **Visualization**: **Evidence Studio** dashboards (`Net Worth.md` and `Cash Reserves.md`) query the BigQuery tables using SQL to generate interactive reports and visualizations.
+
+## Live Dashboards
+
+- **Cash Reserves**: [https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/cash-reserves](https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/cash-reserves)
+- **Net Worth**: [https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/net-worth](https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/net-worth)

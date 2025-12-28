@@ -4,12 +4,12 @@
  * to two different tabs in the active spreadsheet.
  */
 function fetchAndCategorizeAccounts() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet(); 
-  
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
   // Define sheet names
   const CATEGORIZED_SHEET_NAME = 'Account Categorization';
-  const GROUPED_SHEET_NAME = 'Accounts By Type'; 
-  
+  const GROUPED_SHEET_NAME = 'Accounts By Type';
+
   // --- Secure Parameter Retrieval ---
   const properties = PropertiesService.getScriptProperties();
   const API_KEY = properties.getProperty('POCKETSMITH_API_KEY');
@@ -25,9 +25,9 @@ function fetchAndCategorizeAccounts() {
     'method': 'get',
     'headers': {
       'Accept': 'application/json',
-      'X-Developer-Key': API_KEY 
+      'X-Developer-Key': API_KEY
     },
-    'muteHttpExceptions': true 
+    'muteHttpExceptions': true
   };
 
   try {
@@ -40,10 +40,10 @@ function fetchAndCategorizeAccounts() {
 
     // 1. Get raw data with categorization as an Array of Objects
     const categorizedDataObjects = categorizeData(jsonData);
-    
+
     // 2. Write the raw categorized list to its sheet
     const categorizedDataArray = convertObjectsToArrays(categorizedDataObjects);
-    writeToSheet(ss, CATEGORIZED_SHEET_NAME, categorizedDataArray);
+    writeToSheet(ss, CATEGORIZED_SHEET_NAME, categorizedDataArray, { formatColumn: 2, isCurrency: false });
 
     // ----------------------------------------------------
     // 3. Group the Data (Replicating the M-code Table.Group)
@@ -52,13 +52,13 @@ function fetchAndCategorizeAccounts() {
     const groupedDataArray = groupAndSumBalances(dataRows);
 
     // 4. Write GROUPED Data to the "Accounts By Type" tab
-    writeToSheet(ss, GROUPED_SHEET_NAME, groupedDataArray);
-    
+    writeToSheet(ss, GROUPED_SHEET_NAME, groupedDataArray, { formatColumn: 2, isCurrency: false });
+
     Logger.log('Finished updating both categorized and grouped data sheets.');
 
   } catch (e) {
     Logger.log('Error fetching or processing Pocketsmith data: ' + e.message);
-    throw e; 
+    throw e;
   }
 }
 
@@ -73,9 +73,9 @@ function fetchAndCategorizeAccounts() {
 function categorizeData(jsonData) {
   const CASH_TITLES = ["AAA", "BOA", "HSA (CASH)", "UMA", "BREAD LADDER"];
   const INVESTMENT_TITLES = ["HSA (BANK)", "IRA", "PWC 401(K)", "PWC WB"];
-  
+
   // Add Header Object for consistency (optional, but good practice)
-  const data = [{Title: "Title", Balance: "Balance", Type: "Type"}]; 
+  const data = [{ Title: "Title", Balance: "Balance", Type: "Type" }];
 
   jsonData.forEach(record => {
     const title = record.title || '';
@@ -93,7 +93,7 @@ function categorizeData(jsonData) {
     } else if (title === "Condo") {
       type = "Condo";
     }
-    
+
     data.push({
       Title: title,
       Balance: balance,
@@ -110,18 +110,18 @@ function categorizeData(jsonData) {
  * @returns {Array<Array<any>>} 2D array including header row.
  */
 function convertObjectsToArrays(objects) {
-    if (!objects || objects.length === 0) return [[]];
-    
-    // Assumes the first object is the header (keys)
-    const header = Object.keys(objects[0]);
-    
-    // Create the final array starting with the header
-    const array2D = [header];
-    
-    // Map the remaining objects (data rows) to arrays
-    for (let i = 1; i < objects.length; i++) {
-        const row = header.map(key => objects[i][key]);
-        array2D.push(row);
-    }
-    return array2D;
+  if (!objects || objects.length === 0) return [[]];
+
+  // Assumes the first object is the header (keys)
+  const header = Object.keys(objects[0]);
+
+  // Create the final array starting with the header
+  const array2D = [header];
+
+  // Map the remaining objects (data rows) to arrays
+  for (let i = 1; i < objects.length; i++) {
+    const row = header.map(key => objects[i][key]);
+    array2D.push(row);
+  }
+  return array2D;
 }
