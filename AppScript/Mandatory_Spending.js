@@ -1,0 +1,179 @@
+/**
+ * @OnlyCurrentDoc
+ * FINAL PRODUCTION VERSION: Fetches mandatory spending using the Pocketsmith transactions endpoint, 
+ * calculates the grand total mandatory spend, and writes the results to the 'Mandatory Spending' sheet.
+ * Includes pagination logic for full data retrieval.
+ * 
+ * NOTE ON API BEHAVIOR:
+ * The Pocketsmith API returns debit transactions as NEGATIVE numbers (e.g., -50.00).
+ * To calculate the total "cost" or "spend" as a positive magnitude, we must negate 
+ * the sum of these API values.
+ * Example: API returns -100 (spend). We want to show 100 as the cost.
+ * Hence, we use -apiSpendingTotal in the final output.
+ */
+function fetchMandatorySpending() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const SHEET_NAME = 'Mandatory Spending';
+
+  // --- Secure Parameter Retrieval ---
+  const properties = PropertiesService.getScriptProperties();
+  const API_KEY = properties.getProperty('POCKETSMITH_API_KEY');
+  const USER_ID = properties.getProperty('POCKETSMITH_USER_ID');
+
+  // Manual Expenditure Estimates (Scrubbed - Set via Script Properties)
+  const GROCERIES_ESTIMATE = parseFloat(properties.getProperty('GROCERIES_ESTIMATE') || 0.00);
+  const RESTAURANT_ESTIMATE = parseFloat(properties.getProperty('RESTAURANT_ESTIMATE') || 0.00);
+  const HEALTH_INSURANCE_ESTIMATE = parseFloat(properties.getProperty('HEALTH_INSURANCE_ESTIMATE') || 0.00);
+
+  if (!API_KEY || !USER_ID) { throw new Error("Authentication keys not found."); }
+
+  // --- 1. CONFIGURATION & DATE CALCULATION ---
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const YESTERDAY_DATE = Utilities.formatDate(yesterday, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
+
+  const oneYearBeforeYesterday = new Date(yesterday);
+  oneYearBeforeYesterday.setFullYear(oneYearBeforeYesterday.getFullYear() - 1);
+  const ONE_YEAR_BEFORE_YESTERDAY_DATE = Utilities.formatDate(oneYearBeforeYesterday, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
+
+  // Mandatory expense categories (Scrubbed - Set via Script Properties)
+  const categoryString = properties.getProperty('API_CALCULATED_CATEGORIES') || "Mortgages, Utilities";
+  const API_CALCULATED_CATEGORIES = categoryString.split(',').map(s => s.trim()).filter(s => s !== "");
+
+  // Manual estimates (Retrieved from Script Properties)
+  const MANUAL_ESTIMATES = [
+    ["Groceries Estimate", GROCERIES_ESTIMATE],
+    ["Restaurant Estimate", RESTAURANT_ESTIMATE],
+    ["Health Insurance Estimate", HEALTH_INSURANCE_ESTIMATE]
+  ];
+
+  // Base URL for the paginated fetch
+  const baseUrl = `https://api.pocketsmith.com/v2/users/${USER_ID}/transactions?` +
+    `start_date=${ONE_YEAR_BEFORE_YESTERDAY_DATE}&` +
+    `end_date=${YESTERDAY_DATE}&` +
+    `uncategorised=0&` +
+    `type=debit`;
+
+  // --- 2. PAGINATED DATA RETRIEVAL ---
+  try {
+    const allTransactionRecords = fetchPaginatedTransactions(baseUrl, API_KEY);
+
+    if (allTransactionRecords.length === 0) {
+      Logger.log("No transactions found in the specified range and filters. Writing manual estimates only.");
+      // If no transactions, still calculate totals based on 0 API spend
+      const emptyApiSpendingRow = ["Pocketsmith Mandatory Spend (API Calculated)", 0.00];
+      writeFinalTable(ss, SHEET_NAME, emptyApiSpendingRow, MANUAL_ESTIMATES);
+      return;
+    }
+
+    // --- 3. DATA TRANSFORMATION & CALCULATION ---
+    let apiSubtotal = 0;
+
+    allTransactionRecords.forEach(transaction => {
+      const categoryTitle = transaction.category?.title || "Uncategorized";
+      const categoryUpper = categoryTitle.toUpperCase();
+
+      // Amount is 1x (dollars)
+      const amount = transaction.amount || 0;
+
+      // FilterAPIOnlyCategories (Exact Match)
+      if (API_CALCULATED_CATEGORIES.includes(categoryTitle)) {
+
+        // FilterOutGroceries (Case-Insensitive check)
+        if (!categoryUpper.includes("GROCERIES")) {
+          apiSubtotal += amount;
+        }
+      }
+    });
+
+    // 4. FINAL CALCULATIONS
+    const apiSpendingTotal = apiSubtotal;
+    const apiSpendingRow = ["Pocketsmith Mandatory Spend (API Calculated)", -apiSpendingTotal];
+
+    // 5. Write results to the Google Sheet
+    writeFinalTable(ss, SHEET_NAME, apiSpendingRow, MANUAL_ESTIMATES);
+
+    Logger.log('Mandatory Spending sheet successfully updated.');
+
+  } catch (e) {
+    Logger.log('Error in fetchMandatorySpending: ' + e.message);
+    throw e;
+  }
+}
+
+// =========================================================================
+// PAGINATION HELPER FUNCTION
+// =========================================================================
+
+/**
+ * Executes a loop to fetch all pages of transactions from the Pocketsmith API.
+ */
+function fetchPaginatedTransactions(baseUrl, API_KEY) {
+  let allTransactions = [];
+  let page = 1;
+  let hasMorePages = true;
+
+  const options = {
+    'method': 'get',
+    'headers': {
+      'Accept': 'application/json',
+      'X-Developer-Key': API_KEY
+    },
+    'muteHttpExceptions': true
+  };
+
+  while (hasMorePages) {
+    const url = `${baseUrl}&page=${page}`;
+    Logger.log(`Fetching page: ${page}`);
+
+    try {
+      const response = UrlFetchApp.fetch(url, options);
+      if (response.getResponseCode() !== 200) {
+        Logger.log(`API call failed on page ${page} with status: ${response.getResponseCode()}`);
+        break;
+      }
+
+      const transactions = JSON.parse(response.getContentText());
+
+      if (transactions.length === 0) {
+        hasMorePages = false;
+      } else {
+        allTransactions = allTransactions.concat(transactions);
+        page++;
+      }
+    } catch (e) {
+      Logger.log('Error during paginated fetch: ' + e.message);
+      hasMorePages = false;
+    }
+  }
+
+  return allTransactions;
+}
+
+// =========================================================================
+// OUTPUT ASSEMBLY HELPER FUNCTION
+// =========================================================================
+
+/**
+ * Assembles and writes the final table, including API-derived and manual rows.
+ */
+function writeFinalTable(ss, sheetName, apiRow, manualRows) {
+
+  let grandTotalAmount = apiRow[1];
+  manualRows.forEach(row => { grandTotalAmount += row[1]; });
+
+  const grandTotalRows = [
+    ["Grand Total Mandatory Spend", grandTotalAmount],
+    ["Total Mandatory Spend (Daily)", grandTotalAmount / 365],
+    ["Total Mandatory Spend (2 Months)", grandTotalAmount / 6]
+  ];
+
+  const finalTable = [
+    ["Expense Category", "Estimated Annual Spend"],
+    apiRow,
+    ...manualRows,
+    ...grandTotalRows
+  ];
+
+  writeToSheet(ss, sheetName, finalTable, { formatColumn: 2, isCurrency: false });
+}

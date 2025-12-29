@@ -1,0 +1,13 @@
+{
+    "name": "atlas-cannonball-screenshots",
+    "version": "1.0.0",
+    "description": "Automated screenshot tool for Evidence Studio dashboards",
+    "main": "screenshot.js",
+    "scripts": {
+        "capture": "node screenshot.js"
+    },
+    "dependencies": {
+        "puppeteer": "^24.0.0"
+    },
+    "type": "module"
+}

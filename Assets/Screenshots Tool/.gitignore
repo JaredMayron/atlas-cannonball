@@ -1,0 +1,9 @@
+# Ignore the persistent Chrome profile
+chrome-profile/
+
+# Ignore local screenshots
+*.png
+
+# Ignore dependencies
+node_modules/
+package-lock.json
