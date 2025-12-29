@@ -1,5 +1,5 @@
 ## Net Worth by Type
-This is a breakdown in my current net worth of ${% value
+This is a breakdown in my current net worth of {% value
   data="account_categorization"
   value="sum(balance)"
   fmt="usd"
@@ -9,6 +9,7 @@ This is a breakdown in my current net worth of ${% value
   data="account_categorization"
   category="type"
   value="sum(balance)"
+  where="type != '' AND balance > 0"
 /%}
 
 {% table
