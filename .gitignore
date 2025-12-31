@@ -2,3 +2,9 @@ node_modules/
 .clasp.json
 clasp.json
 *.log
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
