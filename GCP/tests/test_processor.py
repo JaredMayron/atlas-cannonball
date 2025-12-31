@@ -13,7 +13,7 @@ def test_categorize_accounts(mock_config_json, sample_accounts):
     assert categorized[1]["type"] == "Cash"
     # 401k -> Investment
     assert categorized[2]["type"] == "Investment"
-    # Tesla -> Car
+    # Honda -> Car
     assert categorized[3]["type"] == "Car"
     # My Condo -> Condo
     assert categorized[4]["type"] == "Condo"

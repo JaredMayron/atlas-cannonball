@@ -6,7 +6,7 @@ def mock_config():
     return {
         "CASH_TITLES": ["CHECKING", "SAVINGS"],
         "INVESTMENT_TITLES": ["401K", "IRA"],
-        "CAR_IDENTIFIER": "TESLA",
+        "CAR_IDENTIFIER": "HONDA",
         "CONDO_IDENTIFIER": "MY CONDO",
         "API_CALCULATED_CATEGORIES": ["Rent", "Utilities", "Internet"],
         "GROCERIES_ESTIMATE": 500,
@@ -24,7 +24,7 @@ def sample_accounts():
         {"title": "Checking", "current_balance": 1000},
         {"title": "Savings", "current_balance": 5000},
         {"title": "401k", "current_balance": 20000},
-        {"title": "Tesla Model 3", "current_balance": -30000},
+        {"title": "Honda Civic", "current_balance": -30000},
         {"title": "My Condo", "current_balance": 500000}
     ]
 
