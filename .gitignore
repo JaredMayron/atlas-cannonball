@@ -2,9 +2,12 @@ node_modules/
 .clasp.json
 clasp.json
 *.log
+.agent/workflows/*
 
 # Python
 __pycache__/
 *.pyc
 venv/
 .env
+.pytest_cache
+

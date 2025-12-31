@@ -9,7 +9,7 @@ class BigQueryClient:
 
     def write_accounts(self, categorized_accounts):
         # TODO: Get table ID from config/env
-        table_id = "your_project.your_dataset.accounts_raw"
+        table_id = "finance-dashboard-481505.financial_data.accounts_raw"
         errors = self.client.insert_rows_json(table_id, categorized_accounts)
         if errors:
             logger.error(f"Encountered errors while inserting accounts: {errors}")
@@ -17,7 +17,7 @@ class BigQueryClient:
             logger.info("Successfully inserted accounts into BigQuery.")
 
     def write_spending(self, mandatory_spending):
-        table_id = "your_project.your_dataset.mandatory_spending"
+        table_id = "finance-dashboard-481505.financial_data.mandatory_spending"
         # Flattening manual estimates for simple BQ storage if needed, 
         # or just storing the whole dict as JSON
         errors = self.client.insert_rows_json(table_id, [mandatory_spending])
@@ -29,7 +29,7 @@ class BigQueryClient:
     def write_runway(self, runway_metrics):
         if not runway_metrics:
             return
-        table_id = "your_project.your_dataset.runway_info"
+        table_id = "finance-dashboard-481505.financial_data.runway_info"
         errors = self.client.insert_rows_json(table_id, [runway_metrics])
         if errors:
             logger.error(f"Encountered errors while inserting runway: {errors}")
