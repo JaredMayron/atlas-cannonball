@@ -3,6 +3,7 @@ node_modules/
 clasp.json
 *.log
 .agent/workflows/*
+.vscode/
 
 # Python
 __pycache__/
