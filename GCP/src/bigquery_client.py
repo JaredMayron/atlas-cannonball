@@ -11,7 +11,9 @@ class BigQueryClient:
         # TODO: Get table ID from config/env
         table_id = "finance-dashboard-481505.financial_data.accounts_raw"
         
-        # Deduplication: Delete existing entries for today's snapshot_date
+        # Deduplication: Delete existing entries for today's snapshot_date.
+        # This satisfies the requirement to deduplicate by (title, snapshot_date)
+        # because we are replacing the *entire* batch for the day with the latest data.
         from datetime import datetime
         today = datetime.now().strftime("%Y-%m-%d")
         delete_query = f"""
@@ -44,6 +46,20 @@ class BigQueryClient:
         if "manual_estimates" in mandatory_spending:
             mandatory_spending["manual_estimates"] = json.dumps(mandatory_spending["manual_estimates"])
             
+        # Deduplication: Delete existing entries for today's snapshot_date
+        from datetime import datetime
+        today = datetime.now().strftime("%Y-%m-%d")
+        delete_query = f"""
+            DELETE FROM `{table_id}`
+            WHERE snapshot_date = '{today}'
+        """
+        try:
+            query_job = self.client.query(delete_query)
+            query_job.result()
+            logger.info(f"Cleared existing spending entries for {today}.")
+        except Exception as e:
+            logger.warning(f"Failed to clear existing spending entries: {e}")
+
         # Use Load Job
         job_config = bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
         try:
