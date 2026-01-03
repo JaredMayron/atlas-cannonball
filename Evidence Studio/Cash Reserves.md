@@ -3,22 +3,43 @@ I hook into PocketSmith and try to determine how long my cash reserves will last
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions."
 /%}. [Click here for more information directly in PocketSmith](https://my.pocketsmith.com/dashboard/75855-emergency)
 
+```sql accounts_gcp
+SELECT * FROM accounts_raw_gcp WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM accounts_raw_gcp)
+```
+
+```sql runway_gcp
+SELECT
+  snapshot_date as date,
+  runway_days as runway,
+  DATE_ADD(snapshot_date, INTERVAL runway_days DAY) as last_until
+FROM runway_info_gcp
+ORDER BY snapshot_date DESC
+```
+
+```sql mandatory_spending_gcp_query
+SELECT
+  snapshot_date,
+  grand_total_annual as estimated_annual_spend,
+  grand_total_daily
+FROM mandatory_spending_gcp
+ORDER BY snapshot_date DESC
+```
+
 I have a total of {% value
-  data="account_categorization"
+  data="accounts_gcp"
   value="sum(balance)"
   fmt="usd"
   where="type = 'Cash'"
 /%} on hand in cash, which is projected to last until {% value
-  data="runway_history_2"
+  data="runway_gcp"
   value="max(last_until)"
   limit=1
   order="date desc"
   fmt="fulldate"
 /%}. On average I have {% value
-  data="mandatory_spending"
-  value="max(estimated_annual_spend)"
+  data="mandatory_spending_gcp_query"
+  value="max(grand_total_daily)"
   limit=1
-  where="expense_category='Total Mandatory Spend (Daily)'"
   fmt="usd"
 /%} in mandatory expenses {% info
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions."
@@ -36,11 +57,11 @@ An interactive graph which shows how my cash reserves change over time based on 
   ]
 /%}
 ```sql cal_heatmap
-SELECT 
-    date,
-    last_until,
-    -1*dateDiff('day', date, UTCTimestamp()) AS days_from_today
-FROM runway_history_2;
+SELECT
+  snapshot_date as date,
+  date_add(snapshot_date, runway_days) as last_until,
+  -1 * dateDiff('day', snapshot_date, UTCTimestamp()) AS days_from_today
+FROM runway_info_gcp
 ```
 {% calendar_heatmap
   data="cal_heatmap"
@@ -49,11 +70,11 @@ FROM runway_history_2;
   where="date {{cal_dates_range.between}}"
 /%}
 Within the period, I had on average {% value
-  data="runway_history_2"
+  data="runway_gcp"
   value="avg(runway)"
   where="date {{cal_dates_range.between}}"
 /%} days [{% delta
-  data="runway_history_2"
+  data="runway_gcp"
   value="avg(runway)"
   text="days"
   date_range={
@@ -69,7 +90,7 @@ Within the period, I had on average {% value
 /%}. 
 
 Sparkline of mandatory spending {% sparkline
-  data="runway_history_2"
+  data="runway_gcp"
   x="date"
   y="runway"
   fit_to_data=true
@@ -84,7 +105,7 @@ Sparkline of mandatory spending {% sparkline
     icon="calendar"
   %}
     {% table
-      data="runway_history_2"
+      data="runway_gcp"
       dimensions=["date","last_until","runway"]
       order="date desc"
     %}
@@ -97,15 +118,15 @@ Sparkline of mandatory spending {% sparkline
 ## Checking Account Rebalancing
 ```sql cash_difference
 SELECT 
-    (SELECT MAX(balance) FROM account_categorization WHERE title = 'BOA') - 
-    (SELECT MAX(estimated_annual_spend) FROM mandatory_spending WHERE expense_category = 'Total Mandatory Spend (2 Months)') AS difference;
+    (SELECT MAX(balance) FROM accounts_raw_gcp WHERE title = 'BOA') - 
+    ((SELECT MAX(grand_total_annual) FROM mandatory_spending_gcp) / 6) AS difference;
 ```
 Reddit /r/personal_finance best practices is to have 2 months of mandatory spending {% info
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions."
 /%} in your checking account. 
 
 I have {% value
-  data="account_categorization"
+  data="accounts_gcp"
   value="max(balance)"
   where="title = 'BOA'"
   limit=1
@@ -113,9 +134,8 @@ I have {% value
 /%} in my checking account and two months of mandatory expenses {% info
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions."
 /%} is {% value
-  data="mandatory_spending"
-  value="max(estimated_annual_spend)"
-  where="expense_category = 'Total Mandatory Spend (2 Months)'"
+  data="mandatory_spending_gcp_query"
+  value="max(estimated_annual_spend) / 6.0"
   limit=1
   fmt="usd"
 /%}. 

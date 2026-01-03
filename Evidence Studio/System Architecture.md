@@ -13,8 +13,6 @@ This diagram illustrates the flow of financial data from various sources into th
 ## Flow Description
 
 1.  **Ingestion**: Financial data from banks, credit cards, investment accounts, real estate, and other assets is automatically aggregated by **PocketSmith** via **Plaid / Yodlee**.
-2.  **Extraction**: **Google Apps Script** pulls raw transaction and account data from the **PocketSmith** API on a daily schedule.
-3.  **Transformation**: The script categorizes accounts (e.g., "Cash", "Investment") and calculates metrics like mandatory spending and financial runway.
-4.  **Staging**: The processed data is written to dedicated tabs in a **Google Sheet**.
-5.  **Storage**: The Google Sheet is synchronized with **BigQuery**, acting as the central data warehouse.
-6.  **Visualization**: This dashboard queries the BigQuery tables using SQL to generate interactive reports and visualizations.
+2.  **Extraction & Transformation**: **GCP Cloud Run** (Python) pulls raw transaction and account data from the **PocketSmith** API, categorizes accounts, and calculates metrics.
+3.  **Storage**: The processed data is pushed directly to **BigQuery**, acting as the central data warehouse.
+4.  **Visualization**: This dashboard queries the BigQuery tables using SQL to generate interactive reports and visualizations.

@@ -1,19 +1,23 @@
 ## Net Worth by Type
+```sql accounts_gcp
+SELECT * FROM accounts_raw_gcp WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM accounts_raw_gcp)
+```
+
 This is a breakdown in my current net worth of {% value
-  data="account_categorization"
+  data="accounts_gcp"
   value="sum(balance)"
   fmt="usd"
 /%}, which are my assets minus liabilities. [Find a more detailed breakdown of net worth here](https://my.pocketsmith.com/net_worth)
 
 {% pie_chart
-  data="account_categorization"
+  data="accounts_gcp"
   category="type"
   value="sum(balance)"
   where="type != '' AND balance > 0"
 /%}
 
 {% table
-    data="account_categorization"
+    data="accounts_gcp"
     order="title asc"
     row_shading=true
     where="type != '' AND balance > 0"

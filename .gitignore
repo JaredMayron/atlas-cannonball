@@ -12,6 +12,7 @@ venv/
 .env
 .pytest_cache
 
+.agent/*
 GCP/terraform/.terraform/*
 GCP/terraform/.terraform.lock.hcl
 *.tfstate
