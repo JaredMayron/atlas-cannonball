@@ -5,8 +5,8 @@ This diagram illustrates the flow of financial data from various sources into th
 ## Data Flow Diagram
 
 {% image 
-    url="https://raw.githubusercontent.com/JaredMayron/atlas-cannonball/refs/heads/main/Assets/architecture.svg"
-    dark_url="https://raw.githubusercontent.com/JaredMayron/atlas-cannonball/refs/heads/main/Assets/architecture_dark.svg"
+    url="https://raw.githubusercontent.com/JaredMayron/atlas-cannonball/refs/heads/Google-AppScript/Assets/architecture.svg"
+    dark_url="https://raw.githubusercontent.com/JaredMayron/atlas-cannonball/refs/heads/Google-AppScript/Assets/architecture_dark.svg"
     description="System Architecture Diagram"
 /%}
 
