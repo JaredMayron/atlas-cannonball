@@ -43,7 +43,8 @@ class DataProcessor:
         
         api_total = 0
         for tx in transactions:
-            category = tx.get("category", {}).get("title", "Uncategorized")
+            category_obj = tx.get("category")
+            category = category_obj.get("title", "Uncategorized") if category_obj else "Uncategorized"
             if category in api_categories and "GROCERIES" not in category.upper():
                 api_total += tx.get("amount", 0)
         
