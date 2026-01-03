@@ -55,3 +55,16 @@ resource "google_secret_manager_secret_iam_member" "config_accessor" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.job_sa.email}"
 }
+
+# Evidence Access Service Account Permissions
+resource "google_project_iam_member" "evidence_access_bq_viewer" {
+  project = var.project_id
+  role    = "roles/bigquery.dataViewer"
+  member  = "serviceAccount:evidence-access@finance-dashboard-481505.iam.gserviceaccount.com"
+}
+
+resource "google_project_iam_member" "evidence_access_bq_job_user" {
+  project = var.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "serviceAccount:evidence-access@finance-dashboard-481505.iam.gserviceaccount.com"
+}
