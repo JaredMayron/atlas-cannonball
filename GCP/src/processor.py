@@ -32,7 +32,7 @@ class DataProcessor:
             
             categorized.append({
                 "title": title,
-                "balance": balance,
+                "balance": round(balance, 2),
                 "type": acc_type,
                 "snapshot_date": datetime.now().strftime("%Y-%m-%d")
             })
