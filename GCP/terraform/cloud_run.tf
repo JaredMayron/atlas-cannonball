@@ -6,7 +6,7 @@ resource "google_cloud_run_v2_job" "financial_refresh" {
     template {
       service_account = google_service_account.job_sa.email
       containers {
-        image = "gcr.io/${var.project_id}/financial-refresh:latest" # Placeholder, build needed
+        image = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.repo.repository_id}/financial-refresh:latest"
 
         env {
           name = "POCKETSMITH_API_KEY"

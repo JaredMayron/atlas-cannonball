@@ -30,7 +30,8 @@ class PocketSmithClient:
             "start_date": start_date.strftime("%Y-%m-%d"),
             "end_date": end_date.strftime("%Y-%m-%d"),
             "uncategorised": 0,
-            "type": "debit"
+            "type": "debit",
+            "per_page": 1000
         }
         
         all_transactions = []
@@ -39,7 +40,15 @@ class PocketSmithClient:
             params["page"] = page
             logger.info(f"Fetching transactions page {page}...")
             response = requests.get(url, headers=self.headers, params=params)
-            response.raise_for_status()
+            
+            if response.status_code == 400 and "out of bounds" in response.text:
+                logger.info("Reached end of transactions (out of bounds).")
+                break
+                
+            if response.status_code != 200:
+                logger.error(f"Failed to fetch transactions at page {page}: {response.text}")
+                response.raise_for_status()
+                
             data = response.json()
             if not data:
                 break

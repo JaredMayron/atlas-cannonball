@@ -17,9 +17,13 @@ class BigQueryClient:
             logger.info("Successfully inserted accounts into BigQuery.")
 
     def write_spending(self, mandatory_spending):
+        import json
         table_id = "finance-dashboard-481505.financial_data.mandatory_spending"
-        # Flattening manual estimates for simple BQ storage if needed, 
-        # or just storing the whole dict as JSON
+        
+        # Ensure manual_estimates is serialized if it exists
+        if "manual_estimates" in mandatory_spending:
+            mandatory_spending["manual_estimates"] = json.dumps(mandatory_spending["manual_estimates"])
+            
         errors = self.client.insert_rows_json(table_id, [mandatory_spending])
         if errors:
             logger.error(f"Encountered errors while inserting spending: {errors}")

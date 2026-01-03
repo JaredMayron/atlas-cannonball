@@ -26,22 +26,19 @@ This diagram illustrates the flow of financial data from various sources into th
 - **Cash Reserves**: [https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/cash-reserves](https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/cash-reserves)
 - **Net Worth**: [https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/net-worth](https://www.evidence.studio/org_01KCNDDX3PYPNT5HNPSZQXZPKV/net-worth-dashboard/net-worth)
 
-## Configuration
+## Configuration (GCP Migration)
 
-To use this system, you must configure the following **Script Properties** in your Google Apps Script project:
+The system has been migrated to **Google Cloud Platform (Cloud Run & BigQuery)**. Configuration is now managed via **Google Cloud Secret Manager**.
 
-| Property | Description | Example |
-| :--- | :--- | :--- |
-| `POCKETSMITH_API_KEY` | Your PocketSmith Developer Key | `your_api_key` |
-| `POCKETSMITH_USER_ID` | Your PocketSmith User ID | `12345` |
-| `GROCERIES_ESTIMATE` | Annual groceries spend estimate | `4000.00` |
-| `RESTAURANT_ESTIMATE` | Annual restaurant spend estimate | `8000.00` |
-| `HEALTH_INSURANCE_ESTIMATE` | Annual health insurance estimate | `6000.00` |
-| `CASH_TITLES` | Comma-separated list of cash account titles | `Chase Checking, Ally Savings, Wells Fargo` |
-| `INVESTMENT_TITLES` | Comma-separated list of investment account titles | `IRA, 401(K)` |
-| `API_CALCULATED_CATEGORIES` | Categories to include in mandatory spend | `Mortgages, Utilities` |
-| `CAR_IDENTIFIER` | Partial match for car assets | `Honda, Toyota` |
-| `CONDO_IDENTIFIER` | Exact match for condo asset | `Condo` |
+For detailed instructions on how to set up the `config_json` secret and other environment variables, please see:
+[GCP CONFIG.md](file:///Users/jared/GitHub/atlas-cannonball/GCP/CONFIG.md)
+
+### Legacy Apps Script Properties
+| Property | Description |
+| :--- | :--- |
+| `POCKETSMITH_API_KEY` | Your PocketSmith Developer Key |
+| `POCKETSMITH_USER_ID` | Your PocketSmith User ID |
+| ... | *See GCP CONFIG.md for full list* |
 
 ## Contributing
 
