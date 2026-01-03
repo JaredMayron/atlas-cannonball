@@ -57,7 +57,7 @@ class DataProcessor:
             "Health Insurance": self.config.get("HEALTH_INSURANCE_ESTIMATE", 0)
         }
         
-        grand_total = api_total + sum(manual_estimates.values())
+        grand_total = round(api_total + sum(manual_estimates.values()), -2)
         
         return {
             "api_mandatory_spend": api_total,

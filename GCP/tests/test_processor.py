@@ -29,8 +29,8 @@ def test_calculate_mandatory_spending(mock_config_json, sample_transactions):
     assert spending["manual_estimates"]["Groceries"] == 500
     
     # Grand Total: 2180 + 1000 = 3180
-    assert spending["grand_total_annual"] == 3180
-    assert spending["grand_total_daily"] == pytest.approx(3180 / 365)
+    assert spending["grand_total_annual"] == 3200
+    assert spending["grand_total_daily"] == pytest.approx(3200 / 365)
 
 def test_calculate_runway(mock_config_json):
     processor = DataProcessor(mock_config_json)
