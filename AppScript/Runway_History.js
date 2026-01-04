@@ -63,43 +63,43 @@ function updateRunwayHistory() {
       }
     }
 
-    // --- 4. APPEND, CLEAN, AND SORT (Deduplication Logic Re-used) ---
+    // --- 4. APPEND, CLEAN, AND SORT (Refactored) ---
 
-    const headerRow = existingData.shift();
-    let historyRows = existingData;
+    // We want to ensure we overwrite any existing entry for 'formattedSnapshotDate'.
+    // Instead of a complex loop, we simply filter out the row with today's date (if any)
+    // and then append the new one.
 
-    // Append the new row 
-    historyRows.push(newHistoryRow);
+    const headerRow = existingData.shift(); // Remove and store header
+    const newDateStr = newHistoryRow[0];    // "yyyy-MM-dd"
 
-    // 4a. Remove Duplicates (Logic from previous step, prioritizing the latest entry)
-    const uniqueDates = {};
-    const finalHistory = [headerRow];
+    // Filter: Keep rows that DO NOT match the new date
+    const filteredRows = existingData.filter(row => {
+      let rDate = row[0];
+      let rDateStr;
 
-    for (let i = historyRows.length - 1; i >= 0; i--) {
-      const row = historyRows[i];
-      let dateValue = row[0];
-      let dateKey;
-
-      // Ensure all date keys are standardized for deduplication
-      if (dateValue instanceof Date) {
-        dateKey = Utilities.formatDate(dateValue, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
-      } else if (typeof dateValue === 'string') {
-        dateKey = dateValue;
+      // Handle Date objects vs Strings in the sheet
+      if (rDate instanceof Date) {
+        rDateStr = Utilities.formatDate(rDate, ss.getSpreadsheetTimeZone(), "yyyy-MM-dd");
       } else {
-        continue;
+        rDateStr = String(rDate);
       }
 
-      if (!uniqueDates[dateKey]) {
-        uniqueDates[dateKey] = true;
-        finalHistory.push(row);
-      }
-    }
+      // Keep row if dates are DIFFERENT
+      return rDateStr !== newDateStr;
+    });
 
-    // 4b. Final Sort (By Date, Descending)
-    const dataForSort = finalHistory.slice(1);
-    dataForSort.sort((a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime());
+    // Append new row
+    filteredRows.push(newHistoryRow);
 
-    const finalSortedData = [headerRow, ...dataForSort];
+    // Sort: By Date, Descending
+    filteredRows.sort((a, b) => {
+      const dateA = new Date(a[0]).getTime();
+      const dateB = new Date(b[0]).getTime();
+      return dateB - dateA;
+    });
+
+    // Reconstruct with header
+    const finalSortedData = [headerRow, ...filteredRows];
 
     // --- 5. WRITE FINAL HISTORY TO SHEET ---
     writeToSheet(ss, HISTORY_SHEET_NAME, finalSortedData);
