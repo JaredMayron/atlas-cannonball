@@ -4,7 +4,14 @@ I hook into PocketSmith and try to determine how long my cash reserves will last
 /%}. [Click here for more information directly in PocketSmith](https://my.pocketsmith.com/dashboard/75855-emergency)
 
 ```sql accounts_gcp
-SELECT * FROM accounts_raw_gcp WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM accounts_raw_gcp)
+SELECT
+  *
+FROM accounts_raw_gcp
+WHERE snapshot_date = (
+  SELECT
+    MAX(snapshot_date)
+  FROM accounts_raw_gcp
+)
 ```
 
 ```sql runway_gcp
@@ -118,8 +125,29 @@ Sparkline of mandatory spending {% sparkline
 ## Checking Account Rebalancing
 ```sql cash_difference
 SELECT 
-    (SELECT MAX(balance) FROM accounts_raw_gcp WHERE title = 'BOA') - 
-    ((SELECT MAX(grand_total_annual) FROM mandatory_spending_gcp) / 6) AS difference;
+    (SELECT MAX(balance) 
+      FROM accounts_raw_gcp 
+      WHERE 
+        (
+          title = 'BOA' AND 
+          snapshot_date = 
+          (
+            SELECT MAX(snapshot_date) FROM accounts_raw_gcp
+          )
+        )
+    ) 
+  - 
+  (
+    (SELECT MAX(grand_total_annual) 
+    FROM mandatory_spending_gcp
+    WHERE 
+      snapshot_date = 
+        (
+          SELECT MAX(snapshot_date) FROM accounts_raw_gcp
+        )
+    ) / 6
+  ) 
+  AS difference;
 ```
 Reddit /r/personal_finance best practices is to have 2 months of mandatory spending {% info
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions."
