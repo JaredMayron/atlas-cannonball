@@ -56,6 +56,12 @@ resource "google_secret_manager_secret_iam_member" "config_accessor" {
   member    = "serviceAccount:${google_service_account.job_sa.email}"
 }
 
+resource "google_project_iam_member" "run_invoker" {
+  project = var.project_id
+  role    = "roles/run.invoker"
+  member  = "serviceAccount:${google_service_account.job_sa.email}"
+}
+
 # Evidence Access Service Account Permissions
 resource "google_project_iam_member" "evidence_access_bq_viewer" {
   project = var.project_id
