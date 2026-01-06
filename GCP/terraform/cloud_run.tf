@@ -51,7 +51,7 @@ resource "google_cloud_run_v2_job" "financial_refresh" {
 resource "google_cloud_scheduler_job" "refresh_timer" {
   name             = "financial-refresh-scheduler"
   description      = "Trigger financial data refresh every 6 hours"
-  schedule         = "0 */6 * * *"
+  schedule         = "10 */6 * * *"
   time_zone        = "Etc/UTC"
   attempt_deadline = "320s"
 
