@@ -70,12 +70,6 @@ SELECT
   -1 * dateDiff('day', snapshot_date, UTCTimestamp()) AS days_from_today
 FROM runway_info_gcp
 ```
-{% calendar_heatmap
-  data="cal_heatmap"
-  date="last_until"
-  value="max(days_from_today)"
-  where="date {{cal_dates_range.between}}"
-/%}
 Within the period, I had on average {% value
   data="runway_gcp"
   value="avg(runway)"
@@ -92,11 +86,9 @@ Within the period, I had on average {% value
     compare_vs="prior period"
     display_type="abs"
   }
-/%}] of mandatory spending {% info
+/%}] of mandatory spending runway{% info
   text="Mandatory expenses are defined as Auto Insurance, Car, Dues and Subscriptions, Education, Fees & Charges, Gas & Fuel, Groceries, Hair, Healthcare & Medical, Homeowners Association, Mortgages, Restaurants & Dining, State Tax, Tax Preparation, Utilities, and Yearly Subscriptions." 
-/%}. 
-
-Sparkline of mandatory spending {% sparkline
+/%}. Sparkline of mandatory spending {% sparkline
   data="runway_gcp"
   x="date"
   y="runway"
@@ -106,6 +98,16 @@ Sparkline of mandatory spending {% sparkline
     range="{{cal_dates_range.range}}"
   }
 /%}
+{% calendar_heatmap
+  data="cal_heatmap"
+  date="last_until"
+  value="max(days_from_today)"
+  where="date {{cal_dates_range.between}}"
+/%}
+
+
+{% /callout %}
+
 {% accordion %}
   {% accordion_item
     title="Underlying Data"
@@ -119,8 +121,6 @@ Sparkline of mandatory spending {% sparkline
     {% /table %}
   {% /accordion_item %}
 {% /accordion %}
-
-{% /callout %}
 
 ## Checking Account Rebalancing
 ```sql cash_difference
