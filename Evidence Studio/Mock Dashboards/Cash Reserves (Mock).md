@@ -19,7 +19,7 @@ SELECT
   snapshot_date as date,
   runway_days as runway,
   DATE_ADD(snapshot_date, INTERVAL runway_days DAY) as last_until
-FROM runway_info_gcp_mock
+FROM runway_info_gcp_mock_long_dither
 ORDER BY snapshot_date DESC
 ```
 
@@ -59,7 +59,7 @@ An interactive graph which shows how my cash reserves change over time based on 
 /%}. A lighter square represents a more recent measurement. 
 {% range_calendar
   id="cal_dates_range"
-  default_range="last 30 days"
+  default_range="last 12 months"
   preset_ranges=["last 7 days","last 30 days","last 12 months","previous week","previous month","previous year"
   ]
 /%}
@@ -68,7 +68,7 @@ SELECT
   snapshot_date as date,
   date_add(snapshot_date, runway_days) as last_until,
   -1 * dateDiff('day', snapshot_date, UTCTimestamp()) AS days_from_today
-FROM runway_info_gcp_mock
+FROM runway_info_gcp_mock_long_dither
 ```
 {% calendar_heatmap
   data="cal_heatmap"

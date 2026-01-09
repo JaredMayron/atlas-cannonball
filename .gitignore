@@ -19,4 +19,5 @@ GCP/terraform/.terraform/*
 GCP/terraform/.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
+.DS_Store
 
