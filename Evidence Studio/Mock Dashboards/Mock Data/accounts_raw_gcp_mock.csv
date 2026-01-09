@@ -1,0 +1,10 @@
+snapshot_date,title,balance,type
+2024-01-01,Chase Checking,12500.00,Cash
+2024-01-01,Ally High Yield Savings,55000.00,Cash
+2024-01-01,Vanguard Total Stock Market,320000.00,Investment
+2024-01-01,Fidelity 401k,115000.00,Investment
+2024-01-01,Mazda CX-5,24000.00,Car
+2024-01-01,Primary Residence,450000.00,Condo
+2024-01-01,Mazda Loan,-8500.00,Other
+2024-01-01,Mortgage,-365000.00,Other
+2024-01-01,Amex Gold,-1500.00,Other
