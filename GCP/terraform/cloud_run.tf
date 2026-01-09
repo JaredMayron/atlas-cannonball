@@ -64,3 +64,16 @@ resource "google_cloud_scheduler_job" "refresh_timer" {
     }
   }
 }
+
+# BOOTSTRAP: Ensure image exists before creating the Cloud Run Job
+resource "null_resource" "bootstrap_image" {
+  triggers = {
+    project_id = var.project_id
+    region     = var.region
+    repo       = google_artifact_registry_repository.repo.repository_id
+  }
+
+  provisioner "local-exec" {
+    command = "${path.module}/../scripts/bootstrap_image.sh ${var.project_id} ${var.region} ${google_artifact_registry_repository.repo.repository_id} financial-refresh"
+  }
+}

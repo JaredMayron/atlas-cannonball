@@ -1,0 +1,15 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_REGION}-docker.pkg.dev/$PROJECT_ID/financial-refresh-repo/financial-refresh:latest', '.']
+    dir: 'GCP'
+
+  # Push the container image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_REGION}-docker.pkg.dev/$PROJECT_ID/financial-refresh-repo/financial-refresh:latest']
+
+images:
+  - '${_REGION}-docker.pkg.dev/$PROJECT_ID/financial-refresh-repo/financial-refresh:latest'
+
+substitutions:
+  _REGION: 'us-central1'
