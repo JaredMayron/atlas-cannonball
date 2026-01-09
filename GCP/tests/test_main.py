@@ -7,17 +7,18 @@ from src.main import main
 @patch("src.main.BigQueryClient")
 @patch("src.main.DataProcessor")
 def test_main_flow(mock_processor_cls, mock_bq_client_cls, mock_ps_client_cls, mock_config_json):
-    # Setup environment variables
+    """Test the complete execution flow of the main function."""
+    # Arrange
+    # 1. Setup Environment
     os.environ["POCKETSMITH_API_KEY"] = "test_key"
     os.environ["POCKETSMITH_USER_ID"] = "123"
     os.environ["CONFIG_JSON"] = mock_config_json
     
-    # Mock instances
+    # 2. Setup Mocks
     mock_ps_client = mock_ps_client_cls.return_value
     mock_bq_client = mock_bq_client_cls.return_value
     mock_processor = mock_processor_cls.return_value
     
-    # Mock behaviors
     mock_ps_client.get_accounts.return_value = [{"title": "test"}]
     mock_ps_client.get_transactions_past_year.return_value = [{"amount": -10}]
     
@@ -25,10 +26,10 @@ def test_main_flow(mock_processor_cls, mock_bq_client_cls, mock_ps_client_cls, m
     mock_processor.calculate_mandatory_spending.return_value = {"grand_total_annual": 100}
     mock_processor.calculate_runway.return_value = {"runway_days": 365}
     
-    # Run main
+    # Act
     main()
     
-    # Verify calls
+    # Assert
     mock_ps_client.get_accounts.assert_called_once()
     mock_ps_client.get_transactions_past_year.assert_called_once()
     mock_processor.categorize_accounts.assert_called_once()
@@ -40,10 +41,13 @@ def test_main_flow(mock_processor_cls, mock_bq_client_cls, mock_ps_client_cls, m
     assert mock_bq_client.write_runway.called
 
 def test_main_missing_env(caplog):
-    # Ensure env vars are missing
+    """Test that main returns early if environment variables are missing."""
+    # Arrange
     if "POCKETSMITH_API_KEY" in os.environ:
         del os.environ["POCKETSMITH_API_KEY"]
         
+    # Act
     main()
     
+    # Assert
     assert "Missing required environment variables" in caplog.text

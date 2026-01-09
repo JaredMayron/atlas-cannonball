@@ -9,6 +9,8 @@ clasp.json
 __pycache__/
 *.pyc
 venv/
+.venv/
+.ruff_cache/
 .env
 .pytest_cache
 
@@ -17,3 +19,4 @@ GCP/terraform/.terraform/*
 GCP/terraform/.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
+
