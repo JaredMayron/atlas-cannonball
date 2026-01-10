@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from google.cloud import bigquery
 from google.api_core import exceptions
 from typing import List, Dict, Any, Optional
@@ -23,8 +24,6 @@ class BigQueryClient:
         # Deduplication: Use date from the data itself
         snapshot_date = unique_accounts[0].get("snapshot_date")
         if not snapshot_date:
-            from datetime import datetime
-
             snapshot_date = datetime.now().strftime("%Y-%m-%d")
             logger.warning(
                 f"Snapshot date missing in data, using current date: {snapshot_date}"
@@ -55,8 +54,6 @@ class BigQueryClient:
         # Deduplication: Use date from data
         snapshot_date = mandatory_spending.get("snapshot_date")
         if not snapshot_date:
-            from datetime import datetime
-
             snapshot_date = datetime.now().strftime("%Y-%m-%d")
 
         self._delete_data_for_date(table_id, snapshot_date)
@@ -73,8 +70,6 @@ class BigQueryClient:
         # Deduplication: Use date from data
         snapshot_date = runway_metrics.get("snapshot_date")
         if not snapshot_date:
-            from datetime import datetime
-
             snapshot_date = datetime.now().strftime("%Y-%m-%d")
 
         self._delete_data_for_date(table_id, snapshot_date)
