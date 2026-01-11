@@ -37,6 +37,22 @@ resource "google_cloud_run_v2_job" "financial_refresh" {
             }
           }
         }
+
+        # BigQuery table IDs
+        env {
+          name  = "BQ_ACCOUNTS_TABLE"
+          value = "${var.project_id}.financial_data.accounts_raw"
+        }
+
+        env {
+          name  = "BQ_SPENDING_TABLE"
+          value = "${var.project_id}.financial_data.mandatory_spending"
+        }
+
+        env {
+          name  = "BQ_RUNWAY_TABLE"
+          value = "${var.project_id}.financial_data.runway_info"
+        }
       }
     }
   }

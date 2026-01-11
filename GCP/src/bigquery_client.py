@@ -1,4 +1,6 @@
+import json
 import logging
+import os
 from datetime import datetime
 from google.cloud import bigquery
 from google.api_core import exceptions
@@ -6,10 +8,20 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
+# Default table IDs (used if environment variables are not set)
+DEFAULT_ACCOUNTS_TABLE = "finance-dashboard-481505.financial_data.accounts_raw"
+DEFAULT_SPENDING_TABLE = "finance-dashboard-481505.financial_data.mandatory_spending"
+DEFAULT_RUNWAY_TABLE = "finance-dashboard-481505.financial_data.runway_info"
+
 
 class BigQueryClient:
     def __init__(self):
         self.client = bigquery.Client()
+        
+        # Load table IDs from environment variables with defaults
+        self.accounts_table = os.getenv("BQ_ACCOUNTS_TABLE", DEFAULT_ACCOUNTS_TABLE)
+        self.spending_table = os.getenv("BQ_SPENDING_TABLE", DEFAULT_SPENDING_TABLE)
+        self.runway_table = os.getenv("BQ_RUNWAY_TABLE", DEFAULT_RUNWAY_TABLE)
 
     def write_accounts(self, categorized_accounts: List[Dict[str, Any]]) -> None:
         if not categorized_accounts:
@@ -17,9 +29,6 @@ class BigQueryClient:
             return
 
         unique_accounts = self._deduplicate_accounts(categorized_accounts)
-
-        # TODO: Get table ID from config/env
-        table_id = "finance-dashboard-481505.financial_data.accounts_raw"
 
         # Deduplication: Use date from the data itself
         snapshot_date = unique_accounts[0].get("snapshot_date")
@@ -29,21 +38,17 @@ class BigQueryClient:
                 f"Snapshot date missing in data, using current date: {snapshot_date}"
             )
 
-        self._delete_data_for_date(table_id, snapshot_date)
+        self._delete_data_for_date(self.accounts_table, snapshot_date)
 
         # Use Load Job instead of Streaming Insert
         job_config = bigquery.LoadJobConfig(
             write_disposition="WRITE_APPEND",  # We already handled dedup via DELETE
         )
-        self._load_data_to_bigquery(table_id, unique_accounts, job_config)
+        self._load_data_to_bigquery(self.accounts_table, unique_accounts, job_config)
 
     def write_spending(self, mandatory_spending: Dict[str, Any]) -> None:
         if not mandatory_spending:
             return
-
-        import json
-
-        table_id = "finance-dashboard-481505.financial_data.mandatory_spending"
 
         # Ensure manual_estimates is serialized if it exists
         if "manual_estimates" in mandatory_spending:
@@ -56,27 +61,27 @@ class BigQueryClient:
         if not snapshot_date:
             snapshot_date = datetime.now().strftime("%Y-%m-%d")
 
-        self._delete_data_for_date(table_id, snapshot_date)
+        self._delete_data_for_date(self.spending_table, snapshot_date)
 
         # Use Load Job
         job_config = bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
-        self._load_data_to_bigquery(table_id, [mandatory_spending], job_config)
+        self._load_data_to_bigquery(self.spending_table, [mandatory_spending], job_config)
 
     def write_runway(self, runway_metrics: Optional[Dict[str, Any]]) -> None:
         if not runway_metrics:
             return
-        table_id = "finance-dashboard-481505.financial_data.runway_info"
+
 
         # Deduplication: Use date from data
         snapshot_date = runway_metrics.get("snapshot_date")
         if not snapshot_date:
             snapshot_date = datetime.now().strftime("%Y-%m-%d")
 
-        self._delete_data_for_date(table_id, snapshot_date)
+        self._delete_data_for_date(self.runway_table, snapshot_date)
 
         # Use Load Job
         job_config = bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
-        self._load_data_to_bigquery(table_id, [runway_metrics], job_config)
+        self._load_data_to_bigquery(self.runway_table, [runway_metrics], job_config)
 
     def _deduplicate_accounts(
         self, accounts: List[Dict[str, Any]]

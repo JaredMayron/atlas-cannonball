@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 def main():
     logger.info("--- Starting Daily Data Refresh (Cloud Run Job) ---")
 
-    # 1. Load Configuration (from Secret Manager or Env)
-    # TODO: Implement Secret Manager loading
+    # Load configuration from environment variables
+    # (Secrets are injected by Cloud Run via Secret Manager - see terraform/cloud_run.tf)
     api_key = os.getenv("POCKETSMITH_API_KEY")
     user_id = os.getenv("POCKETSMITH_USER_ID")
     config_json = os.getenv("CONFIG_JSON")  # Contains CATEGORIES, TITLES, etc.
