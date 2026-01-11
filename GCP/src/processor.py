@@ -12,17 +12,18 @@ GROCERIES_CATEGORY = "GROCERIES"
 class DataProcessor:
     def __init__(self, config_json: Optional[str]):
         self.config = json.loads(config_json) if config_json else {}
-        
+
         # Pre-parse account categorization config
         self.cash_titles = [t.upper() for t in self.config.get("CASH_TITLES", [])]
-        self.investment_titles = [t.upper() for t in self.config.get("INVESTMENT_TITLES", [])]
+        self.investment_titles = [
+            t.upper() for t in self.config.get("INVESTMENT_TITLES", [])
+        ]
         self.car_identifier = self.config.get("CAR_IDENTIFIER", "").upper()
         self.condo_identifier = self.config.get("CONDO_IDENTIFIER", "").upper()
 
     def categorize_accounts(
         self, accounts: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
-
         categorized = []
         for acc in accounts:
             title = acc.get("title", "")
@@ -65,7 +66,10 @@ class DataProcessor:
                 if category_obj
                 else "Uncategorized"
             )
-            if category in api_categories and GROCERIES_CATEGORY not in category.upper():
+            if (
+                category in api_categories
+                and GROCERIES_CATEGORY not in category.upper()
+            ):
                 api_total += tx.get("amount", 0)
 
         # Pocketsmith debits are negative, we want positive cost

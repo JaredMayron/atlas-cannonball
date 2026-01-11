@@ -2,7 +2,7 @@ node_modules/
 .clasp.json
 clasp.json
 *.log
-.agent/workflows/*
+
 .vscode/
 
 # Python
@@ -14,7 +14,6 @@ venv/
 .env
 .pytest_cache
 
-.agent/*
 GCP/terraform/.terraform/*
 GCP/terraform/.terraform.lock.hcl
 *.tfstate

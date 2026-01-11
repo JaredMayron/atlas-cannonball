@@ -17,7 +17,7 @@ DEFAULT_RUNWAY_TABLE = "finance-dashboard-481505.financial_data.runway_info"
 class BigQueryClient:
     def __init__(self):
         self.client = bigquery.Client()
-        
+
         # Load table IDs from environment variables with defaults
         self.accounts_table = os.getenv("BQ_ACCOUNTS_TABLE", DEFAULT_ACCOUNTS_TABLE)
         self.spending_table = os.getenv("BQ_SPENDING_TABLE", DEFAULT_SPENDING_TABLE)
@@ -65,12 +65,13 @@ class BigQueryClient:
 
         # Use Load Job
         job_config = bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
-        self._load_data_to_bigquery(self.spending_table, [mandatory_spending], job_config)
+        self._load_data_to_bigquery(
+            self.spending_table, [mandatory_spending], job_config
+        )
 
     def write_runway(self, runway_metrics: Optional[Dict[str, Any]]) -> None:
         if not runway_metrics:
             return
-
 
         # Deduplication: Use date from data
         snapshot_date = runway_metrics.get("snapshot_date")
