@@ -2,6 +2,7 @@ import json
 import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+from schemas import validate_account_schema, validate_transaction_schema
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,7 @@ GROCERIES_CATEGORY = "GROCERIES"
 class DataProcessor:
     def __init__(self, config_json: Optional[str]):
         self.config = json.loads(config_json) if config_json else {}
+        self.validate_config()
 
         # Pre-parse account categorization config
         self.cash_titles = [t.upper() for t in self.config.get("CASH_TITLES", [])]
@@ -21,11 +23,28 @@ class DataProcessor:
         self.car_identifier = self.config.get("CAR_IDENTIFIER", "").upper()
         self.condo_identifier = self.config.get("CONDO_IDENTIFIER", "").upper()
 
+    def validate_config(self):
+        """Ensures that required configuration keys are present."""
+        required_keys = [
+            "CASH_TITLES",
+            "INVESTMENT_TITLES",
+            "API_CALCULATED_CATEGORIES",
+        ]
+        missing = [key for key in required_keys if key not in self.config]
+        if missing:
+            raise ValueError(f"Missing required configuration keys: {', '.join(missing)}")
+
     def categorize_accounts(
         self, accounts: List[Dict[str, Any]]
     ) -> List[Dict[str, Any]]:
         categorized = []
         for acc in accounts:
+            try:
+                validate_account_schema(acc)
+            except ValueError as e:
+                logger.warning(f"Skipping malformed account: {e}")
+                continue
+
             title = acc.get("title", "")
             balance = acc.get("current_balance", 0)
             acc_type = self._determine_account_type(title)
@@ -60,6 +79,12 @@ class DataProcessor:
 
         api_total = 0
         for tx in transactions:
+            try:
+                validate_transaction_schema(tx)
+            except ValueError as e:
+                logger.warning(f"Skipping malformed transaction: {e}")
+                continue
+
             category_obj = tx.get("category")
             category = (
                 category_obj.get("title", "Uncategorized")

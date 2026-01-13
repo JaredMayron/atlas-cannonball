@@ -58,3 +58,71 @@ def test_calculate_runway(mock_config_json):
     assert runway["annual_burn"] == 5000
     assert runway["runway_years"] == 2.0
     assert runway["runway_days"] == 730
+
+
+def test_calculate_runway_zero_burn(mock_config_json):
+    """Test that zero or negative burn rate doesn't crash calculations."""
+    # Arrange
+    processor = DataProcessor(mock_config_json)
+    accounts = [{"type": "Cash", "balance": 1000}]
+
+    # Act
+    runway_zero = processor.calculate_runway(accounts, {"grand_total_annual": 0})
+    runway_negative = processor.calculate_runway(accounts, {"grand_total_annual": -100})
+
+    # Assert
+    assert runway_zero is None
+    assert runway_negative is None
+
+
+def test_validate_config_missing_keys():
+    """Test that DataProcessor raises ValueError on missing required config keys."""
+    # Arrange
+    invalid_config = '{"CASH_TITLES": ["CHECKING"]}'  # Missing others
+
+    # Act & Assert
+    import pytest
+    with pytest.raises(ValueError) as excinfo:
+        DataProcessor(invalid_config)
+    
+    assert "Missing required configuration keys" in str(excinfo.value)
+    assert "INVESTMENT_TITLES" in str(excinfo.value)
+    assert "API_CALCULATED_CATEGORIES" in str(excinfo.value)
+
+
+def test_categorize_accounts_schema_error_logging(mock_config_json, caplog):
+    """Test that malformed accounts are skipped and logged."""
+    # Arrange
+    processor = DataProcessor(mock_config_json)
+    dirty_accounts = [
+        {"title": "Valid", "current_balance": 100},
+        {"current_balance": 100},  # Missing title
+    ]
+
+    # Act
+    with caplog.at_level("WARNING"):
+        categorized = processor.categorize_accounts(dirty_accounts)
+
+    # Assert
+    assert len(categorized) == 1
+    assert "Skipping malformed account" in caplog.text
+    assert "title" in caplog.text
+
+
+def test_calculate_spending_schema_error_logging(mock_config_json, caplog):
+    """Test that malformed transactions are skipped and logged."""
+    # Arrange
+    processor = DataProcessor(mock_config_json)
+    dirty_transactions = [
+        {"amount": -100, "category": {"title": "Rent"}},
+        {"category": {"title": "Rent"}},  # Missing amount
+    ]
+
+    # Act
+    with caplog.at_level("WARNING"):
+        spending = processor.calculate_mandatory_spending(dirty_transactions)
+
+    # Assert
+    assert spending["api_mandatory_spend"] == 100
+    assert "Skipping malformed transaction" in caplog.text
+    assert "amount" in caplog.text
