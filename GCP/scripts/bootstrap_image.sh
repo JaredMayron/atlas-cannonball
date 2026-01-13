@@ -34,5 +34,5 @@ else
     # Push the image
     docker push "$FULL_IMAGE_NAME"
     
-    echo "Bootstrap build complete."
+    echo "Bootstrap build of $FULL_IMAGE_NAME complete."
 fi
