@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: model_decision
 description: When a change is committed to source code or a infrastructure as code file
 ---
 
