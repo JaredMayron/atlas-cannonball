@@ -1,3 +1,4 @@
+# Cloud Run Job for refreshing financial data from Pocketsmith to BigQuery
 resource "google_cloud_run_v2_job" "financial_refresh" {
   name     = "financial-refresh"
   location = var.region
