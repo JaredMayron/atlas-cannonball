@@ -10,19 +10,10 @@ This workflow scans Python dependencies for known security vulnerabilities using
 
 ## Steps
 
-1. Create a temporary virtual environment, install pip-audit, and audit requirements:
+1. Run pip-audit using uv:
 
 ```bash
-python3 -m venv /tmp/pip-audit-venv && \
-source /tmp/pip-audit-venv/bin/activate && \
-pip install --quiet pip-audit && \
-pip-audit -r GCP/requirements.txt --disable-pip --no-deps
-```
-
-2. Clean up the temporary virtual environment:
-
-```bash
-rm -rf /tmp/pip-audit-venv
+cd GCP && uv run pip-audit
 ```
 
 ## Interpreting Results
