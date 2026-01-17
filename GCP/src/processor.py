@@ -32,7 +32,9 @@ class DataProcessor:
         ]
         missing = [key for key in required_keys if key not in self.config]
         if missing:
-            raise ValueError(f"Missing required configuration keys: {', '.join(missing)}")
+            raise ValueError(
+                f"Missing required configuration keys: {', '.join(missing)}"
+            )
 
     def categorize_accounts(
         self, accounts: List[Dict[str, Any]]

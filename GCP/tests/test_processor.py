@@ -82,9 +82,10 @@ def test_validate_config_missing_keys():
 
     # Act & Assert
     import pytest
+
     with pytest.raises(ValueError) as excinfo:
         DataProcessor(invalid_config)
-    
+
     assert "Missing required configuration keys" in str(excinfo.value)
     assert "INVESTMENT_TITLES" in str(excinfo.value)
     assert "API_CALCULATED_CATEGORIES" in str(excinfo.value)

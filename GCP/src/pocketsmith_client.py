@@ -74,4 +74,3 @@ class PocketSmithClient:
         logger.info("Transaction counts per month (smoke test):")
         for month in sorted(monthly_counts.keys()):
             logger.info(f"  {month}: {monthly_counts[month]} transactions")
-
