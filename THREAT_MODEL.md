@@ -80,7 +80,7 @@ Based on `THREAT_MODEL_FEEDBACK.md`, the following previously identified gaps ha
 
 ## Remaining Gaps & Monitoring
 - **API Health**: No automated alerting currently exists if the PocketSmith API key expires or if rate limits are reached.
-- **Dependency Vulnerabilities**: Regular scanning of Python dependencies in `requirements.txt` is recommended (e.g., via `pip-audit` or Dependabot).
+- **Dependency Vulnerabilities**: Regular scanning of Python dependencies in `pyproject.toml` and `uv.lock` is recommended (e.g., via `pip-audit` or Dependabot).
 - **Deletion Protection**: BigQuery tables currently have `deletion_protection = false` in Terraform, which increases the risk of accidental data loss during infrastructure updates.
 - **Log Masking**: While secrets themselves aren't logged, large JSON configurations (`CONFIG_JSON`) could potentially be logged in debugging scenarios; consider explicit masking.
 
