@@ -32,6 +32,9 @@ class PocketSmithClient:
             "type": "debit",
             "per_page": 1000,
         }
+        logger.info(
+            f"Fetching transactions from {params['start_date']} to {params['end_date']}..."
+        )
 
         all_transactions = []
         page = 1
@@ -56,4 +59,19 @@ class PocketSmithClient:
             all_transactions.extend(data)
             page += 1
 
+        self._log_monthly_counts(all_transactions)
         return all_transactions
+
+    def _log_monthly_counts(self, transactions: List[Dict[str, Any]]) -> None:
+        """Log monthly transaction counts as a smoke test."""
+        monthly_counts = {}
+        for tx in transactions:
+            date_str = tx.get("date", "unknown")
+            if date_str != "unknown":
+                month_key = date_str[:7]  # YYYY-MM
+                monthly_counts[month_key] = monthly_counts.get(month_key, 0) + 1
+
+        logger.info("Transaction counts per month (smoke test):")
+        for month in sorted(monthly_counts.keys()):
+            logger.info(f"  {month}: {monthly_counts[month]} transactions")
+
