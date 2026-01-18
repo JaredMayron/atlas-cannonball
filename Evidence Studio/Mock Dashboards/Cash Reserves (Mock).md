@@ -6,11 +6,11 @@ I hook into PocketSmith and try to determine how long my cash reserves will last
 ```sql accounts_gcp
 SELECT
   *
-FROM accounts_raw_gcp_mock
+FROM accounts_raw_gcp_mock_qmhaze
 WHERE snapshot_date = (
   SELECT
     MAX(snapshot_date)
-  FROM accounts_raw_gcp_mock
+  FROM accounts_raw_gcp_mock_qmhaze
 )
 ```
 
@@ -126,13 +126,13 @@ Sparkline of mandatory spending {% sparkline
 ```sql cash_difference
 SELECT 
     (SELECT MAX(balance) 
-      FROM accounts_raw_gcp_mock 
+      FROM accounts_raw_gcp_mock_qmhaze 
       WHERE 
         (
           title = 'Chase Checking' AND 
           snapshot_date = 
           (
-            SELECT MAX(snapshot_date) FROM accounts_raw_gcp_mock
+            SELECT MAX(snapshot_date) FROM accounts_raw_gcp_mock_qmhaze
           )
         )
     ) 
@@ -143,7 +143,7 @@ SELECT
     WHERE 
       snapshot_date = 
         (
-          SELECT MAX(snapshot_date) FROM accounts_raw_gcp_mock
+          SELECT MAX(snapshot_date) FROM accounts_raw_gcp_mock_qmhaze
         )
     ) / 6
   ) 

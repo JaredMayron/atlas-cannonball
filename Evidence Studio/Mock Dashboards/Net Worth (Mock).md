@@ -1,6 +1,6 @@
 ## Net Worth by Type (Mock)
 ```sql accounts_gcp
-SELECT * FROM accounts_raw_gcp_mock WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM accounts_raw_gcp_mock)
+SELECT * FROM accounts_raw_gcp_mock_qmhaze WHERE snapshot_date = (SELECT MAX(snapshot_date) FROM accounts_raw_gcp_mock_qmhaze)
 ```
 
 This is a breakdown in my current net worth of {% value
