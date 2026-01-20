@@ -13,12 +13,15 @@ This is a breakdown in my current net worth of {% value
   data="accounts_gcp"
   category="type"
   value="sum(balance)"
+  value_fmt="usd"
+  where="type != ''"
 /%}
 
 {% table
     data="accounts_gcp"
     order="title asc"
     row_shading=true
+    where="type != ''"
 %}
 {% dimension
   value="title"
