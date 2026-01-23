@@ -1,7 +1,13 @@
-# Cloud Run Job for refreshing financial data from Pocketsmith to BigQuery
 resource "google_cloud_run_v2_job" "financial_refresh" {
   name     = "financial-refresh"
   location = var.region
+
+  labels = {
+    "environment" = lower(var.environment)
+    "service"     = "financial-refresh"
+    "owner"       = lower(var.github_owner)
+    "managed-by"  = "terraform"
+  }
 
   template {
     template {
@@ -39,20 +45,20 @@ resource "google_cloud_run_v2_job" "financial_refresh" {
           }
         }
 
-        # BigQuery table IDs
+        # BigQuery table IDs - Refactored to use resource references
         env {
           name  = "BQ_ACCOUNTS_TABLE"
-          value = "${var.project_id}.financial_data.accounts_raw"
+          value = "${var.project_id}.${google_bigquery_dataset.financial_data.dataset_id}.${google_bigquery_table.accounts_raw.table_id}"
         }
 
         env {
           name  = "BQ_SPENDING_TABLE"
-          value = "${var.project_id}.financial_data.mandatory_spending"
+          value = "${var.project_id}.${google_bigquery_dataset.financial_data.dataset_id}.${google_bigquery_table.mandatory_spending.table_id}"
         }
 
         env {
           name  = "BQ_RUNWAY_TABLE"
-          value = "${var.project_id}.financial_data.runway_info"
+          value = "${var.project_id}.${google_bigquery_dataset.financial_data.dataset_id}.${google_bigquery_table.runway_info.table_id}"
         }
       }
     }

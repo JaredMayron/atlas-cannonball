@@ -1,0 +1,5 @@
+project_id   = "finance-dashboard-481505"
+region       = "us-central1"
+environment  = "prod"
+github_owner = "JaredMayron"
+github_repo  = "atlas-cannonball"

@@ -1,12 +1,26 @@
 resource "google_bigquery_dataset" "financial_data" {
   dataset_id = local.dataset_id
   location   = var.region
+
+  labels = {
+    "environment" = lower(var.environment)
+    "service"     = "financial-refresh"
+    "owner"       = lower(var.github_owner)
+    "managed-by"  = "terraform"
+  }
 }
 
 resource "google_bigquery_table" "accounts_raw" {
   dataset_id = google_bigquery_dataset.financial_data.dataset_id
   table_id   = "accounts_raw"
   deletion_protection = false
+
+  labels = {
+    "environment" = lower(var.environment)
+    "service"     = "financial-refresh"
+    "owner"       = lower(var.github_owner)
+    "managed-by"  = "terraform"
+  }
 
   schema = <<EOF
 [
@@ -23,6 +37,13 @@ resource "google_bigquery_table" "mandatory_spending" {
   table_id   = "mandatory_spending"
   deletion_protection = false
 
+  labels = {
+    "environment" = lower(var.environment)
+    "service"     = "financial-refresh"
+    "owner"       = lower(var.github_owner)
+    "managed-by"  = "terraform"
+  }
+
   schema = <<EOF
 [
   {"name": "api_mandatory_spend", "type": "FLOAT", "mode": "REQUIRED"},
@@ -38,6 +59,13 @@ resource "google_bigquery_table" "runway_info" {
   dataset_id = google_bigquery_dataset.financial_data.dataset_id
   table_id   = "runway_info"
   deletion_protection = false
+
+  labels = {
+    "environment" = lower(var.environment)
+    "service"     = "financial-refresh"
+    "owner"       = lower(var.github_owner)
+    "managed-by"  = "terraform"
+  }
 
   schema = <<EOF
 [

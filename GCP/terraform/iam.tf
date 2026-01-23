@@ -66,11 +66,11 @@ resource "google_project_iam_member" "run_invoker" {
 resource "google_project_iam_member" "evidence_access_bq_viewer" {
   project = var.project_id
   role    = "roles/bigquery.dataViewer"
-  member  = "serviceAccount:evidence-access@finance-dashboard-481505.iam.gserviceaccount.com"
+  member  = "serviceAccount:evidence-access@${var.project_id}.iam.gserviceaccount.com"
 }
 
 resource "google_project_iam_member" "evidence_access_bq_job_user" {
   project = var.project_id
   role    = "roles/bigquery.jobUser"
-  member  = "serviceAccount:evidence-access@finance-dashboard-481505.iam.gserviceaccount.com"
+  member  = "serviceAccount:evidence-access@${var.project_id}.iam.gserviceaccount.com"
 }
